@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-// Edge runtime can't import @/lib/env (Zod's parse can interact poorly with
-// the Edge bundler depending on dependencies). NEXTAUTH_SECRET is read via
-// process.env here; the Node-side env module still validates it at boot.
+// Edge runtime. NEXTAUTH_SECRET is read via process.env here (the validated
+// env module is Node-only); any Node code path that imports @/lib/env will
+// still fail at boot if the value is missing.
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -22,8 +22,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Phase 3 adds the emailVerified check:
-    //   if (!token.emailVerified) return NextResponse.redirect(new URL("/verify-email-required", req.url));
+    // Signed in but email not verified -> verification landing page.
+    // emailVerified is a Date when verified, null otherwise. Cast through
+    // the augmented JWT interface from src/types/next-auth.d.ts.
+    if (!token.emailVerified) {
+      return NextResponse.redirect(new URL("/verify-email-required", req.url));
+    }
   }
 
   return NextResponse.next();

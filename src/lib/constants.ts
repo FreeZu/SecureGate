@@ -16,3 +16,11 @@ export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 // --- Token shape ---
 // security.md §2: crypto.randomBytes(32).toString("hex") => 64 hex chars.
 export const TOKEN_HEX_LENGTH = 64;
+
+// --- Email ---
+// Dev placeholder. Phase 6 must swap to a verified custom-domain address
+// (e.g., "SecureGate <no-reply@securegate.dev>") per AGENTS.md "Domain status".
+// onboarding@resend.dev works without domain verification but Resend only
+// permits sending to the account-owner's email — fine for dev smoke tests
+// against delivered@resend.dev, not for shipping.
+export const FROM_ADDRESS = "SecureGate <onboarding@resend.dev>";

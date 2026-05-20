@@ -1,18 +1,10 @@
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireVerified } from "@/lib/session";
 
-// Belt-and-suspenders: middleware already redirects unauthenticated requests
-// for /dashboard, but middleware runs on Edge and only handles the path
-// matcher. This server-side check covers anything the matcher might miss and
-// keeps the contract explicit. Per nextauth-integration skill §6.
+// Belt-and-suspenders: middleware redirects unverified users at the Edge,
+// this layout repeats the check on the Node side so anything the matcher
+// misses still lands correctly. requireVerified() redirects on its own.
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-
-  // Phase 3 adds:
-  //   if (!session.user.emailVerified) redirect("/verify-email-required");
-
+  await requireVerified();
   return <div className="min-h-screen">{children}</div>;
 }

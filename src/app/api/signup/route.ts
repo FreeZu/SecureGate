@@ -39,14 +39,12 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return badRequest();
 
   try {
-    // createAccount returns null on duplicate email; both branches produce
-    // the same response so the API does not disclose existence (security.md §5).
-    // Phase 3 will branch the email send: new account gets verification mail,
-    // existing user gets a "someone tried to sign up with your email" notice.
+    // createAccount is existence-safe. Its return value distinguishes new
+    // account vs duplicate vs email-send-failed, but the wire response is
+    // identical across all branches so the API does not leak which one
+    // happened (security.md §5).
     await createAccount(parsed.data);
-    return okWithMessage(
-      "Account created. Verification email will be sent in Phase 3.",
-    );
+    return okWithMessage("Check your email to confirm your account.");
   } catch (err) {
     console.error("[api/signup]", err);
     return serverError();

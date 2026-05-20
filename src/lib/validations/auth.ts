@@ -35,3 +35,22 @@ export const loginSchema = z
   .strict();
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+// Verification tokens are 64 lowercase hex characters from
+// crypto.randomBytes(32).toString("hex"). Validate the shape before any DB
+// lookup so malformed inputs return notFound() fast and consistently.
+export const verifyEmailSchema = z
+  .object({
+    token: z.string().regex(/^[a-f0-9]{64}$/),
+  })
+  .strict();
+
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
+export const resendVerificationSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email().max(254),
+  })
+  .strict();
+
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
