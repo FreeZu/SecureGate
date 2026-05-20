@@ -1,0 +1,41 @@
+// SecureGate — Prisma schema.
+// The three canonical models per AGENTS.md §5 and prisma-auth-schema-and-migrations skill §1.
+// Do not rename fields. New fields require justification (see schema-evolution §7 of the skill).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String    // bcrypt hash, never plain text
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+
+  // No separate @@index([email]) needed — @unique already creates one.
+}
+
+model VerificationToken {
+  identifier String   // the user's email
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([expires])
+}
+
+model PasswordResetToken {
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@index([email])
+  @@index([expires])
+}

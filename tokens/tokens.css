@@ -1,0 +1,244 @@
+/* =============================================================================
+   SecureGate — Design Tokens
+   -----------------------------------------------------------------------------
+   CSS custom properties for the SecureGate authentication app and marketing
+   surface. Import this file once at the root of your Next.js app (in
+   `src/app/globals.css` via `@import '../../tokens/tokens.css';`) so every
+   component can reference these variables.
+
+   Token groups:
+     1. Colors        (brand, surface, text, semantic, terminal, focus)
+     2. Typography    (font families, sizes, weights, line heights)
+     3. Spacing       (8px base scale + section rhythm)
+     4. Radius        (pill + card vocabulary)
+     5. Borders       (hairline widths)
+     6. Z-index       (layer order)
+     7. Breakpoints   (responsive tiers — for reference only; use in @media)
+     8. Component primitives (pre-composed sizes for buttons, inputs, etc.)
+============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     1. COLORS
+  --------------------------------------------------------------------------- */
+
+  /* Brand & Accent */
+  --color-primary: #121111;
+  --color-ink-deep: #090909;
+
+  /* Surface */
+  --color-canvas: #ffffff;
+  --color-surface-soft: #fafafa;
+  --color-surface-dark: #171717;
+  --color-hairline: #e5e5e5;
+  --color-hairline-strong: #d4d4d4;
+
+  /* Text */
+  --color-ink: #000000;
+  --color-charcoal: #525252;
+  --color-body: #737373;
+  --color-mute: #a3a3a3;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-on-dark-mute: rgba(255, 255, 255, 0.7);
+
+  /* Semantic (in-product form validation only — never on marketing chrome) */
+  --color-error: #dc2626;
+  --color-error-soft: #fef2f2;
+  --color-success: #16a34a;
+  --color-warning: #ca8a04;
+  --color-info-mute: #525252;
+
+  /* Terminal traffic lights (terminal-card only) */
+  --color-terminal-red: #ff5f56;
+  --color-terminal-yellow: #ffbd2e;
+  --color-terminal-green: #27c93f;
+
+  /* Focus */
+  --color-focus-ring: rgba(59, 130, 246, 0.5);
+
+  /* ---------------------------------------------------------------------------
+     2. TYPOGRAPHY
+  --------------------------------------------------------------------------- */
+
+  /* Font families */
+  --font-display: "SF Pro Rounded", system-ui, -apple-system, "Segoe UI",
+    "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Roboto",
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* Font sizes */
+  --font-size-display-xl: 36px;
+  --font-size-display-lg: 30px;
+  --font-size-heading-lg: 24px;
+  --font-size-heading-md: 20px;
+  --font-size-heading-sm: 18px;
+  --font-size-body-md: 16px;
+  --font-size-body-sm: 14px;
+  --font-size-caption-sm: 12px;
+  --font-size-code-md: 16px;
+  --font-size-code-sm: 14px;
+  --font-size-button-md: 14px;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Line heights (unitless) */
+  --line-height-display-xl: 1.11;
+  --line-height-display-lg: 1.2;
+  --line-height-heading-lg: 1.33;
+  --line-height-heading-md: 1.4;
+  --line-height-heading-sm: 1.56;
+  --line-height-body-md: 1.5;
+  --line-height-body-sm: 1.43;
+  --line-height-caption-sm: 1.33;
+  --line-height-button-md: 1;
+
+  /* Letter spacing */
+  --letter-spacing-default: 0;
+
+  /* ---------------------------------------------------------------------------
+     3. SPACING (8px base)
+  --------------------------------------------------------------------------- */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-section: 88px;
+  --spacing-section-tablet: 64px;
+  --spacing-section-mobile: 48px;
+
+  /* ---------------------------------------------------------------------------
+     4. RADIUS
+  --------------------------------------------------------------------------- */
+  --rounded-none: 0px;
+  --rounded-sm: 6px;
+  --rounded-md: 8px;
+  --rounded-lg: 12px;
+  --rounded-full: 9999px;
+
+  /* ---------------------------------------------------------------------------
+     5. BORDERS
+  --------------------------------------------------------------------------- */
+  --border-width-hairline: 1px;
+  --border-width-focus: 2px;
+
+  /* ---------------------------------------------------------------------------
+     6. Z-INDEX
+  --------------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-nav: 10;
+  --z-dropdown: 20;
+  --z-overlay: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+
+  /* ---------------------------------------------------------------------------
+     7. BREAKPOINTS (reference values — use inside @media queries)
+  --------------------------------------------------------------------------- */
+  --breakpoint-mobile: 640px;
+  --breakpoint-tablet-narrow: 768px;
+  --breakpoint-tablet: 850px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-desktop-large: 1280px;
+
+  /* ---------------------------------------------------------------------------
+     8. COMPONENT PRIMITIVES
+  --------------------------------------------------------------------------- */
+
+  /* Button sizing */
+  --button-height: 36px;
+  --button-padding-x: 20px;
+  --button-padding-y: 8px;
+
+  /* Input sizing */
+  --input-height: 40px;
+  --input-padding-x: 16px;
+  --input-padding-y: 8px;
+
+  /* Search pill */
+  --search-pill-height: 36px;
+  --search-pill-padding-x: 16px;
+
+  /* Code-snippet pill */
+  --code-snippet-height: 48px;
+  --code-snippet-padding-x: 20px;
+  --code-snippet-padding-y: 12px;
+
+  /* Card */
+  --card-padding: var(--spacing-xxl);
+  --card-radius: var(--rounded-lg);
+  --card-border: var(--border-width-hairline) solid var(--color-hairline);
+
+  /* Auth-card (login / signup / forgot / reset) */
+  --auth-card-max-width: 440px;
+
+  /* Marketing content column */
+  --content-max-width: 720px;
+  --pricing-grid-max-width: 960px;
+
+  /* Nav */
+  --nav-height: 56px;
+
+  /* Animation */
+  --transition-fast: 120ms ease-out;
+  --transition-base: 180ms ease-out;
+}
+
+/* =============================================================================
+   Optional: prefers-color-scheme dark stub
+   -----------------------------------------------------------------------------
+   SecureGate's marketing surface is light-only by design. If you later add a
+   dark-mode product UI, override the surface/text tokens inside this block.
+   Leaving it empty here keeps the system explicitly single-theme.
+============================================================================= */
+@media (prefers-color-scheme: dark) {
+  /* Intentionally empty. SecureGate is light-canvas only by design. */
+}
+
+/* =============================================================================
+   Utility classes — semantic shortcuts that map to tokens
+   -----------------------------------------------------------------------------
+   Use these sparingly; prefer Tailwind utilities or component-scoped CSS.
+   These exist so token values aren't duplicated in component styles.
+============================================================================= */
+
+.text-display-xl {
+  font-family: var(--font-display);
+  font-size: var(--font-size-display-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-display-xl);
+}
+
+.text-body-md {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-md);
+  color: var(--color-body);
+}
+
+.text-code-md {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-code-md, 1.5);
+}
+
+.pill {
+  border-radius: var(--rounded-full);
+}
+
+.card {
+  background: var(--color-canvas);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
