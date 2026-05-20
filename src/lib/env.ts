@@ -6,13 +6,22 @@ import { z } from "zod";
 // Any file that needs an env var imports { env } from "@/lib/env" and reads
 // from the validated object, never directly from process.env.
 
+// Treat empty strings and the "FILL_ME_IN" placeholder as "not set" so the
+// dev .env.local can declare a slot without satisfying the schema yet.
+// Used only on vars that are optional in this phase.
+const stripPlaceholder = (v: unknown): unknown =>
+  typeof v === "string" && (v === "" || v === "FILL_ME_IN") ? undefined : v;
+
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   NEXTAUTH_SECRET: z.string().min(32),
   NEXTAUTH_URL: z.string().url(),
   RESEND_API_KEY: z.string().min(1),
-  UPSTASH_REDIS_REST_URL: z.string().url(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+  // Upstash vars are optional until Phase 5 wires up rate-limit.ts. At that
+  // point they become required at boot. Phase 5 TODO: drop the preprocess
+  // and the .optional() so security.md §10's "fail at boot if missing" holds.
+  UPSTASH_REDIS_REST_URL: z.preprocess(stripPlaceholder, z.string().url().optional()),
+  UPSTASH_REDIS_REST_TOKEN: z.preprocess(stripPlaceholder, z.string().min(1).optional()),
   CRON_SECRET: z.string().min(32),
 });
 

@@ -1,0 +1,37 @@
+import { z } from "zod";
+
+// Server-side validation for the auth surface. Per security.md §4:
+//   - .trim().toLowerCase() on every email field
+//   - .max(...) on every string (oversized-payload DoS)
+//   - .strict() on write schemas (blocks mass assignment per security.md §7)
+//
+// Password constraints per security.md §1:
+//   - signup: min 8, max 72, must include a letter AND a number
+//   - login:  min 1, max 72 (the schema only confirms shape — bcrypt.compare
+//             does the real work; older passwords may predate the strength rule)
+// 72 is bcrypt's hard limit; longer strings are silently truncated, which
+// becomes a vulnerability if not enforced.
+
+export const signupSchema = z
+  .object({
+    name: z.string().trim().min(1).max(100),
+    email: z.string().trim().toLowerCase().email().max(254),
+    password: z
+      .string()
+      .min(8)
+      .max(72)
+      .regex(/[A-Za-z]/, "Password must include a letter")
+      .regex(/[0-9]/, "Password must include a number"),
+  })
+  .strict();
+
+export type SignupInput = z.infer<typeof signupSchema>;
+
+export const loginSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email().max(254),
+    password: z.string().min(1).max(72),
+  })
+  .strict();
+
+export type LoginInput = z.infer<typeof loginSchema>;
