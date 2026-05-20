@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { VERIFICATION_TOKEN_TTL_MS } from "@/lib/constants";
+import { hashPassword } from "@/lib/password";
+import { VERIFICATION_TOKEN_TTL_MS, RESET_TOKEN_TTL_MS } from "@/lib/constants";
 
 // All token plumbing for the auth surface. Per security.md §2 and the
 // prisma-auth-schema-and-migrations skill §3/§5.
@@ -60,6 +61,57 @@ export async function consumeVerificationToken(token: string) {
       data: { emailVerified: new Date() },
     }),
     prisma.verificationToken.delete({ where: { token } }),
+  ]);
+
+  return record;
+}
+
+// --- Password reset tokens ---
+
+/**
+ * Issue a password-reset token for `email`, atomically replacing any prior one
+ * so the "at most one valid reset token per email" invariant holds under
+ * concurrent issuance. 1-hour TTL per security.md §2.
+ */
+export async function issueResetToken(email: string) {
+  const token = generateToken();
+  const expires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+
+  await prisma.$transaction([
+    prisma.passwordResetToken.deleteMany({ where: { email } }),
+    prisma.passwordResetToken.create({ data: { email, token, expires } }),
+  ]);
+
+  return { token, expires };
+}
+
+/**
+ * Consume a reset token: write the new bcrypt-hashed password to the user AND
+ * delete the token atomically. Returns the token record on success, null on
+ * any failure mode (not found / expired / consumed).
+ *
+ * bcrypt.hash runs OUTSIDE the transaction array — prisma.$transaction's
+ * array form expects PrismaPromise entries, and any async work that returns
+ * a regular Promise must be done before the array is constructed
+ * (prisma-auth-schema §3).
+ */
+export async function consumeResetToken(token: string, newPassword: string) {
+  const record = await prisma.passwordResetToken.findUnique({ where: { token } });
+
+  if (!record) return null;
+  if (record.expires < new Date()) {
+    await prisma.passwordResetToken.delete({ where: { token } });
+    return null;
+  }
+
+  const hashed = await hashPassword(newPassword);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { email: record.email },
+      data: { password: hashed },
+    }),
+    prisma.passwordResetToken.delete({ where: { token } }),
   ]);
 
   return record;

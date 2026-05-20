@@ -3,6 +3,7 @@ import { render } from "@react-email/render";
 import { env } from "@/lib/env";
 import { FROM_ADDRESS } from "@/lib/constants";
 import { VerifyEmail } from "@/emails/verify-email";
+import { ResetPassword } from "@/emails/reset-password";
 
 // All Resend interaction goes through this module. Per react-email-templates
 // skill §2 + §9: send both html and text variants; guard console.error with
@@ -40,6 +41,38 @@ export async function sendVerificationEmail(params: {
   if (error) {
     if (process.env.NODE_ENV !== "production") {
       console.error("[email/verify] send failed", { error, to: params.to });
+    }
+    throw new Error("Email send failed");
+  }
+  return data;
+}
+
+export async function sendResetEmail(params: {
+  to: string;
+  name: string;
+  resetUrl: string;
+}) {
+  const element = (
+    <ResetPassword name={params.name} resetUrl={params.resetUrl} />
+  );
+  const html = await render(element);
+  const text = await render(element, { plainText: true });
+
+  const { data, error } = await resend.emails.send({
+    from: FROM_ADDRESS,
+    to: params.to,
+    subject: "Reset your SecureGate password",
+    html,
+    text,
+    headers: {
+      "List-Unsubscribe": "<mailto:unsubscribe@securegate.dev>",
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+
+  if (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[email/reset] send failed", { error, to: params.to });
     }
     throw new Error("Email send failed");
   }
