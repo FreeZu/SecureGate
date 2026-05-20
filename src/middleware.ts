@@ -1,13 +1,32 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { rateLimit } from "@/lib/rate-limit";
 
-// Edge runtime. NEXTAUTH_SECRET is read via process.env here (the validated
-// env module is Node-only); any Node code path that imports @/lib/env will
-// still fail at boot if the value is missing.
+// Edge runtime.
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Rate-limit NextAuth's credential signin endpoint per security.md §3
+  // (5 / IP / 10 min). Intercepted here because the route belongs to
+  // NextAuth's catch-all; doing it in middleware keeps the limiter ahead
+  // of any DB work and concentrates rate-limit logic in one place.
+  if (pathname === "/api/auth/callback/credentials" && req.method === "POST") {
+    const rl = await rateLimit(req, "auth-signin");
+    if (!rl.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Too many sign-in attempts. Please wait a few minutes before trying again.",
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rl.retryAfterSeconds) },
+        },
+      );
+    }
+  }
 
   if (pathname.startsWith("/dashboard")) {
     const token = await getToken({
@@ -15,16 +34,12 @@ export async function middleware(req: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET,
     });
 
-    // Not signed in -> bounce to /login with a callback URL.
     if (!token) {
       const url = new URL("/login", req.url);
       url.searchParams.set("callbackUrl", req.url);
       return NextResponse.redirect(url);
     }
 
-    // Signed in but email not verified -> verification landing page.
-    // emailVerified is a Date when verified, null otherwise. Cast through
-    // the augmented JWT interface from src/types/next-auth.d.ts.
     if (!token.emailVerified) {
       return NextResponse.redirect(new URL("/verify-email-required", req.url));
     }
@@ -34,5 +49,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/api/auth/callback/:path*"],
 };
