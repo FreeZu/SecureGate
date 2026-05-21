@@ -9,20 +9,19 @@
 
 ## Summary of Completed Phases
 
-### Phase 1: Scaffold & DB ✅
-**Commit:** `b3bd144` — chore: bootstrap Next.js, Prisma, env, tokens  
+### Phase 1: Scaffold & DB**Commit:** `b3bd144` — chore: bootstrap Next.js, Prisma, env, tokens  
 **Completed:** Initial project setup
 
 **What was done:**
-- ✅ Next.js 14 bootstrapped with App Router, TypeScript, Tailwind CSS, ESLint
-- ✅ Prisma ORM configured with PostgreSQL connection
-- ✅ Three core models created in schema:
+- Next.js 14 bootstrapped with App Router, TypeScript, Tailwind CSS, ESLint
+- Prisma ORM configured with PostgreSQL connection
+- Three core models created in schema:
   - `User` (id, name, email, password, emailVerified, createdAt)
   - `VerificationToken` (identifier, token, expires)
   - `PasswordResetToken` (email, token, expires)
-- ✅ Environment variables set up (.env.local, .env.example)
-- ✅ Initial migration applied: `init_auth_schema`
-- ✅ Git repository initialized and pushed to GitHub
+- Environment variables set up (.env.local, .env.example)
+- Initial migration applied: `init_auth_schema`
+- Git repository initialized and pushed to GitHub
 
 **Key files created:**
 - `prisma/schema.prisma` — database models
@@ -31,25 +30,24 @@
 
 ---
 
-### Phase 2: Auth Core ✅
-**Commit:** `5e461a8` — feat(auth): Phase 2 core - NextAuth, signup, middleware  
+### Phase 2: Auth Core**Commit:** `5e461a8` — feat(auth): Phase 2 core - NextAuth, signup, middleware  
 **Completed:** Core authentication infrastructure
 
 **What was done:**
-- ✅ NextAuth.js configured with Credentials provider
-- ✅ `src/lib/auth.ts` — NextAuth config with JWT strategy
+- NextAuth.js configured with Credentials provider
+- `src/lib/auth.ts` — NextAuth config with JWT strategy
   - `authorize()` callback: email lookup → `bcrypt.compare()` → returns user or null
   - JWT session strategy chosen (no DB session table, minimal schema, Edge middleware compatible)
   - **Trade-off noted:** JWT tokens don't invalidate on password change until 7-day expiry
-- ✅ `POST /api/signup` endpoint
+- `POST /api/signup` endpoint
   - Zod server-side validation (email, password, confirmPassword)
   - `bcrypt.hash(password, 12)` before user creation
   - Duplicate email check
   - Secure password hashing verified (no plain text)
-- ✅ Middleware protection
+- Middleware protection
   - `src/middleware.ts` — unauthenticated users redirected from `/dashboard` to `/login`
   - Token verification on protected routes
-- ✅ Signup and login UI pages created
+- Signup and login UI pages created
 
 **Key files created:**
 - `src/lib/auth.ts` — NextAuth configuration
@@ -62,35 +60,34 @@
 - `src/lib/validations/auth.ts` — Zod schemas
 
 **Manual tests performed:**
-- ✅ User signup creates bcrypt-hashed password (not plain text)
-- ✅ Login validates credentials correctly
-- ✅ Unauthenticated users blocked from `/dashboard`
+- User signup creates bcrypt-hashed password (not plain text)
+- Login validates credentials correctly
+- Unauthenticated users blocked from `/dashboard`
 
 ---
 
-### Phase 3: Email Verification Flow ✅
-**Commit:** `c54186d` — feat(auth): Phase 3 email verification flow  
+### Phase 3: Email Verification Flow**Commit:** `c54186d` — feat(auth): Phase 3 email verification flow  
 **Completed:** Email verification with token expiry
 
 **What was done:**
-- ✅ Token generation on signup
+- Token generation on signup
   - `crypto.randomBytes(32).toString('hex')` — cryptographically secure tokens
   - 15-minute expiry set on `VerificationToken`
   - Saved to database before email send
-- ✅ `POST /api/signup` enhanced
+- `POST /api/signup` enhanced
   - After user creation, token generated and saved
   - Verification email sent via Resend
   - Response includes verification pending message
-- ✅ Email template created
+- Email template created
   - React Email template (`src/emails/VerificationEmail.tsx`)
   - Email contains magic link: `${NEXTAUTH_URL}/verify-email/${token}`
   - Uses Resend API for delivery
-- ✅ `/verify-email/[token]` route
+- `/verify-email/[token]` route
   - Token validation (exists, not expired)
   - Sets `user.emailVerified = new Date()` on valid token
   - **Single-use:** token deleted immediately after consumption
   - Expires if token missing or past expiry — user can request resend
-- ✅ Middleware updated
+- Middleware updated
   - Only verified users can access `/dashboard`
   - Unauthenticated users and unverified users blocked
   - Redirect to login for unverified
@@ -105,19 +102,18 @@
 
 ---
 
-### Phase 4: Forgot Password Flow ✅
-**Commit:** `146ea49` — feat(auth): Phase 4 forgot + reset password flow  
+### Phase 4: Forgot Password Flow**Commit:** `146ea49` — feat(auth): Phase 4 forgot + reset password flow  
 **Completed:** Complete password reset workflow
 
 **What was done:**
-- ✅ `/forgot-password` page and flow
+- `/forgot-password` page and flow
   - User enters email address
   - `POST /api/forgot-password` endpoint created
   - Server generates reset token: `crypto.randomBytes(32).toString('hex')`
   - **1-hour expiry** set on `PasswordResetToken`
   - Reset email sent via Resend with magic link: `${NEXTAUTH_URL}/reset-password/${token}`
   - **Security:** Always returns success (never confirm/deny email exists)
-- ✅ `/reset-password/[token]` route
+- `/reset-password/[token]` route
   - Token validation (exists, not expired)
   - User enters new password
   - `POST /api/reset-password` endpoint
@@ -126,10 +122,10 @@
   - **Single-use:** token deleted immediately after consumption
   - Redirect to login on success
   - Clear error handling for expired tokens — offer resend option
-- ✅ Email templates
+- Email templates
   - `src/emails/ResetPasswordEmail.tsx` — React Email template
   - Contains reset link with token
-- ✅ Zod validations
+- Zod validations
   - Password confirmation matching
   - Email existence checks (server-side)
   - Token expiry validation
@@ -143,44 +139,43 @@
 - Updated `src/lib/validations/auth.ts` — password reset schemas
 
 **Security validation:**
-- ✅ Generic error messages (no account existence leaks)
-- ✅ Token expiry enforced (1 hour)
-- ✅ Token single-use (deleted after consumption)
-- ✅ New password hashed with bcrypt 12 rounds
-- ✅ Old sessions NOT invalidated (JWT limitation, documented)
+- Generic error messages (no account existence leaks)
+- Token expiry enforced (1 hour)
+- Token single-use (deleted after consumption)
+- New password hashed with bcrypt 12 rounds
+- Old sessions NOT invalidated (JWT limitation, documented)
 
 ---
 
-### Phase 5: Rate Limiting & Security Hardening ✅
-**Commit:** `0c5c707` — feat(security): Phase 5 rate limit, headers, cleanup cron  
+### Phase 5: Rate Limiting & Security Hardening**Commit:** `0c5c707` — feat(security): Phase 5 rate limit, headers, cleanup cron  
 **Completed:** Brute-force protection, security headers, token cleanup
 
 **What was done:**
-- ✅ Rate limiting with Upstash
+- Rate limiting with Upstash
   - `src/lib/rate-limit.ts` — rate-limit helper using @upstash/ratelimit
   - `POST /api/auth/signin` — **5 attempts per IP per 10 minutes**
   - `POST /api/forgot-password` — **5 attempts per IP per 10 minutes**
   - `POST /api/signup` — **10 attempts per IP per hour** (more lenient, legitimate signup flow)
   - Rate limiter runs **before** DB queries (security first)
   - Returns 429 (Too Many Requests) with Retry-After header on limit exceeded
-- ✅ Security headers in `next.config.js`
+- Security headers in `next.config.js`
   - `X-Frame-Options: DENY` — prevents clickjacking
   - `X-Content-Type-Options: nosniff` — prevents MIME type sniffing
   - `Referrer-Policy: strict-origin-when-cross-origin` — controls referrer leakage
   - Applied globally to all routes via `/(.*)`
-- ✅ Automated token cleanup cron job
+- Automated token cleanup cron job
   - `src/app/api/cron/cleanup-tokens/route.ts` — cleanup endpoint
   - Deletes expired `VerificationToken` records
   - Deletes expired `PasswordResetToken` records
   - Invoked by Vercel Cron (schedule configurable in `vercel.json`)
   - Authenticated via `CRON_SECRET` header (same entropy as `NEXTAUTH_SECRET`)
   - Returns 200 with cleanup summary, 401 on invalid secret
-- ✅ Error message audit
+- Error message audit
   - All API errors reviewed for information leaks
   - Generic messages returned to client ("Invalid credentials", not "Wrong password" or "No such email")
   - Detailed errors logged server-side only
   - No stack traces or DB errors exposed
-- ✅ Token expiry validation
+- Token expiry validation
   - Verification tokens: 15-minute expiry
   - Reset tokens: 1-hour expiry
   - Cron cleanup runs automatically
@@ -194,13 +189,13 @@
 - `vercel.json` — cron schedule configuration
 
 **Security self-test results:**
-- ✅ Brute-force: Rate limit returns 429 after 5 failed login attempts
-- ✅ Wrong password: Generic "Invalid credentials" response
-- ✅ Expired token: "Token invalid or expired" message (no existence leak)
-- ✅ Replayed token: Single-use enforcement, returns error on second attempt
-- ✅ SQL injection: Zod validation + Prisma parameterization
-- ✅ Stack traces: Caught and logged server-side, generic message to client
-- ✅ Headers: All three security headers present and correct
+- Brute-force: Rate limit returns 429 after 5 failed login attempts
+- Wrong password: Generic "Invalid credentials" response
+- Expired token: "Token invalid or expired" message (no existence leak)
+- Replayed token: Single-use enforcement, returns error on second attempt
+- SQL injection: Zod validation + Prisma parameterization
+- Stack traces: Caught and logged server-side, generic message to client
+- Headers: All three security headers present and correct
 
 ---
 
@@ -209,16 +204,16 @@
 ### Completed Features
 | Feature | Status | Notes |
 |---------|--------|-------|
-| User sign up | ✅ | Email verification required, bcrypt-hashed password |
-| User login | ✅ | JWT sessions, NextAuth Credentials provider, rate-limited |
-| Email verification | ✅ | Token-based, 15-min expiry, single-use |
-| Password reset | ✅ | Token-based, 1-hour expiry, single-use |
-| Protected dashboard | ✅ | Requires authentication + email verification |
-| Rate limiting | ✅ | Upstash Redis, 5 failed attempts / 10 min on login |
-| Security headers | ✅ | XFrame, ContentType, Referrer policies |
-| Token cleanup | ✅ | Automated cron job deletes expired tokens |
-| Logout | ✅ | NextAuth session destruction + redirect |
-| Password hashing | ✅ | bcryptjs 12 rounds, never plain text |
+| User sign up | Done | Email verification required, bcrypt-hashed password |
+| User login | Done | JWT sessions, NextAuth Credentials provider, rate-limited |
+| Email verification | Done | Token-based, 15-min expiry, single-use |
+| Password reset | Done | Token-based, 1-hour expiry, single-use |
+| Protected dashboard | Done | Requires authentication + email verification |
+| Rate limiting | Done | Upstash Redis, 5 failed attempts / 10 min on login |
+| Security headers | Done | XFrame, ContentType, Referrer policies |
+| Token cleanup | Done | Automated cron job deletes expired tokens |
+| Logout | Done | NextAuth session destruction + redirect |
+| Password hashing | Done | bcryptjs 12 rounds, never plain text |
 
 ### Tech Stack Summary
 - **Framework:** Next.js 14 (App Router)
@@ -379,29 +374,29 @@ CRON_SECRET=<generate same way as NEXTAUTH_SECRET>
 ## Testing Checklist (Completed)
 
 ### Manual Feature Testing
-- ✅ Signup creates user with bcrypt-hashed password
-- ✅ Email verification token sent and validated
-- ✅ Forgot password flow sends reset link
-- ✅ Reset password updates user in DB
-- ✅ Dashboard protected (redirect to login if not authenticated)
-- ✅ Dashboard protected (redirect to login if not verified)
-- ✅ Logout destroys session and redirects
+- Signup creates user with bcrypt-hashed password
+- Email verification token sent and validated
+- Forgot password flow sends reset link
+- Reset password updates user in DB
+- Dashboard protected (redirect to login if not authenticated)
+- Dashboard protected (redirect to login if not verified)
+- Logout destroys session and redirects
 
 ### Security Testing
-- ✅ Rate limiting blocks after 5 failed login attempts
-- ✅ Brute-force response: generic "Invalid credentials"
-- ✅ Expired token: user can request resend
-- ✅ Replayed token: single-use enforcement, error on second attempt
-- ✅ SQL injection: Zod validation + Prisma prevents injection
-- ✅ Stack traces: not exposed to client
-- ✅ DB errors: not exposed to client
-- ✅ Security headers present in all responses
+- Rate limiting blocks after 5 failed login attempts
+- Brute-force response: generic "Invalid credentials"
+- Expired token: user can request resend
+- Replayed token: single-use enforcement, error on second attempt
+- SQL injection: Zod validation + Prisma prevents injection
+- Stack traces: not exposed to client
+- DB errors: not exposed to client
+- Security headers present in all responses
 
 ### Configuration Verification
-- ✅ `.env.local` in `.gitignore` (not committed)
-- ✅ Secrets not hardcoded in code
-- ✅ TypeScript strict mode enabled
-- ✅ No `@ts-ignore` without justification
+- `.env.local` in `.gitignore` (not committed)
+- Secrets not hardcoded in code
+- TypeScript strict mode enabled
+- No `@ts-ignore` without justification
 
 ---
 
@@ -434,8 +429,8 @@ Visit `http://localhost:3000` to test locally.
 
 ## Deployable Status
 
-✅ **Code is production-ready for Phases 1–5**  
-❌ **Phase 6 blocked** — awaiting production domain provisioning
+**Code is production-ready for Phases 1–5**  
+**Phase 6 blocked** — awaiting production domain provisioning
 
 **Before deploying to production:**
 1. Provision real domain
@@ -479,12 +474,7 @@ See `.agent/rules/` for conventions: code style, security rules, architecture, d
 
 **SecureGate is a production-grade authentication system** demonstrating correct IAM patterns. Five phases of implementation are complete:
 
-1. **Phase 1:** Database and scaffolding ✅
-2. **Phase 2:** Core auth (NextAuth, signup, login) ✅
-3. **Phase 3:** Email verification flow ✅
-4. **Phase 4:** Forgot password flow ✅
-5. **Phase 5:** Rate limiting and security hardening ✅
-
+1. **Phase 1:** Database and scaffolding2. **Phase 2:** Core auth (NextAuth, signup, login)3. **Phase 3:** Email verification flow4. **Phase 4:** Forgot password flow5. **Phase 5:** Rate limiting and security hardening
 **All code is secure, tested, and ready for Phase 6 (UI polish) and deployment.** The project follows strict security principles (Murphy's Law, Kerckhoffs's Principle) and zero-tolerance policies on hardcoded secrets, plain-text passwords, and information leaks.
 
 Next agent picking this up: read `AGENTS.md` in full, then review this log for context. All decisions are justified. Ask if unclear.
