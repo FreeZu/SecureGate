@@ -31,9 +31,9 @@ export const authOptions: NextAuthOptions = {
 
   // 3. Custom pages — redirect NextAuth's default UI to SecureGate routes.
   pages: {
-    signIn: "/login",
-    signOut: "/login",
-    error: "/login",
+    signIn: "/auth/login",
+    signOut: "/auth/login",
+    error: "/auth/login",
   },
 
   // 4. Credentials provider.

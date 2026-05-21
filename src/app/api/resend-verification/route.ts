@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     if (user && user.emailVerified === null) {
       const { token } = await issueVerificationToken(user.email);
-      const verifyUrl = `${env.NEXTAUTH_URL}/verify-email/${token}`;
+      const verifyUrl = `${env.NEXTAUTH_URL}/auth/verify-email/${token}`;
       try {
         await sendVerificationEmail({
           to: user.email,

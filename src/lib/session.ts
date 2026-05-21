@@ -18,7 +18,7 @@ export async function getCurrentUser() {
  */
 export async function requireVerified() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-  if (!session.user.emailVerified) redirect("/verify-email-required");
+  if (!session) redirect("/auth/login");
+  if (!session.user.emailVerified) redirect("/auth/verify-email-required");
   return session;
 }

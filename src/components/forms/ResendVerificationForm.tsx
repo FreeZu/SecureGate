@@ -39,7 +39,7 @@ export function ResendVerificationForm() {
           If an account is awaiting verification, we&apos;ve sent a new email. Check your inbox.
         </p>
         <div className="mt-lg text-body-sm text-body">
-          <Link href="/login" className="underline">
+          <Link href="/auth/login" className="underline">
             Back to sign in
           </Link>
         </div>

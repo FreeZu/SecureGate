@@ -30,7 +30,7 @@ securegate/
 │   │   ├── page.tsx                       # Home page (marketing surface)
 │   │   ├── globals.css                    # Imports tokens.css + Tailwind directives
 │   │   │
-│   │   ├── (auth)/                        # Route group — unauthenticated screens
+│   │   ├── auth/                          # Public auth surface — all auth screens under /auth/*
 │   │   │   ├── layout.tsx                 # Centered auth-card shell
 │   │   │   ├── signup/page.tsx
 │   │   │   ├── login/page.tsx
@@ -110,9 +110,12 @@ securegate/
 
 ## 2. App Router Conventions
 
+### Auth path segment
+- `auth/` is a real path segment, not a route group — every auth-flow page lives under `/auth/*` (e.g. `/auth/login`, `/auth/signup`, `/auth/verify-email/[token]`). Its `layout.tsx` provides the centered-card shell shared by every auth screen.
+- This is a SecureGate-specific convention: a single, discoverable namespace for everything auth-related, matching Clerk / Auth0 / Vercel-style URL layouts.
+
 ### Route Groups
-- `(auth)` groups unauthenticated screens that share a centered-card layout. The parentheses make the segment invisible in the URL.
-- `(protected)` groups screens requiring auth. Its `layout.tsx` runs `requireVerified()` from `@/lib/session` and redirects to `/login` if missing.
+- `(protected)` groups screens requiring auth. Its `layout.tsx` runs `requireVerified()` from `@/lib/session` and redirects to `/auth/login` if missing. The parentheses make the segment invisible in the URL — `(protected)/dashboard/page.tsx` serves at `/dashboard`.
 - **Do not create new route groups** without an explicit shared-layout reason.
 
 ### Route-Private Components (`_components/`)

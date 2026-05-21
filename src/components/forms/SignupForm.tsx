@@ -60,7 +60,7 @@ export function SignupForm() {
         </p>
         <div className="mt-lg text-body-sm text-body">
           Already verified?{" "}
-          <Link href="/login" className="underline">
+          <Link href="/auth/login" className="underline">
             Sign in
           </Link>
         </div>
@@ -128,7 +128,7 @@ export function SignupForm() {
       </Button>
       <div className="mt-md text-body-sm text-body">
         Already have an account?{" "}
-        <Link href="/login" className="underline">
+        <Link href="/auth/login" className="underline">
           Sign in
         </Link>
       </div>

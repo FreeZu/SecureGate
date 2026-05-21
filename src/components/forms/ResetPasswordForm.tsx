@@ -35,7 +35,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       });
       if (r.ok) {
         setStatus("success");
-        setTimeout(() => router.push("/login"), 1200);
+        setTimeout(() => router.push("/auth/login"), 1200);
       } else {
         setStatus("error");
       }
@@ -93,7 +93,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             doesn&apos;t meet the requirements.
           </p>
           <p className="mt-md text-body-sm text-body">
-            <Link href="/forgot-password" className="underline">
+            <Link href="/auth/forgot-password" className="underline">
               Request a new reset link
             </Link>
           </p>

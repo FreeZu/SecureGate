@@ -48,7 +48,7 @@ export function LoginForm() {
       const cleaned = new URLSearchParams(params);
       cleaned.delete("error");
       const qs = cleaned.toString();
-      router.replace(qs ? `/login?${qs}` : "/login");
+      router.replace(qs ? `/auth/login?${qs}` : "/auth/login");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorParam]);
@@ -119,12 +119,12 @@ export function LoginForm() {
         {isSubmitting ? "Signing in…" : "Sign in"}
       </Button>
       <div className="mt-md flex flex-col gap-xs text-body-sm text-body">
-        <Link href="/forgot-password" className="underline">
+        <Link href="/auth/forgot-password" className="underline">
           Forgot your password?
         </Link>
         <span>
           Need an account?{" "}
-          <Link href="/signup" className="underline">
+          <Link href="/auth/signup" className="underline">
             Sign up
           </Link>
         </span>

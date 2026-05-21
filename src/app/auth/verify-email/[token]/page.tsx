@@ -45,7 +45,7 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
           <h1 className="text-heading-lg font-display font-semibold text-ink">Email verified</h1>
           <p className="mt-lg text-body-md text-body">You can now sign in to your account.</p>
           <Link
-            href="/login"
+            href="/auth/login"
             className="mt-xl inline-block text-button-md font-medium text-primary underline"
           >
             Continue to sign in
@@ -61,7 +61,7 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
             This verification link has expired or already been used.
           </p>
           <Link
-            href="/verify-email-required"
+            href="/auth/verify-email-required"
             className="mt-xl inline-block text-button-md font-medium text-primary underline"
           >
             Request a new verification email

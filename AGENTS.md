@@ -75,12 +75,14 @@ securegate/
 │   └── migrations/
 ├── src/
 │   ├── app/
-│   │   ├── (auth)/
+│   │   ├── auth/
+│   │   │   ├── layout.tsx
 │   │   │   ├── signup/page.tsx
 │   │   │   ├── login/page.tsx
 │   │   │   ├── forgot-password/page.tsx
 │   │   │   ├── reset-password/[token]/page.tsx
-│   │   │   └── verify-email/[token]/page.tsx
+│   │   │   ├── verify-email/[token]/page.tsx
+│   │   │   └── verify-email-required/page.tsx
 │   │   ├── (protected)/
 │   │   │   └── dashboard/page.tsx
 │   │   ├── api/
@@ -190,22 +192,22 @@ The agent must respect this ordering. **Do not skip ahead.** A broken Phase 2 bu
 - `authorize()` must: look up user by email → `bcrypt.compare()` → return user or `null`.
 - Choose JWT **or** database sessions. Document the choice and rationale in `README.md`.
 - `POST /api/signup`: Zod-validate → `bcrypt.hash(password, 12)` → save user.
-- Protect `/dashboard` via `middleware.ts` — unauthenticated users redirect to `/login`.
+- Protect `/dashboard` via `middleware.ts` — unauthenticated users redirect to `/auth/login`.
 - Manual test: confirm DB password is a bcrypt hash, **not plain text**.
 
 ### Phase 3 — Email Verification
 - On signup, generate token: `crypto.randomBytes(32).toString('hex')`.
 - Save token + 15-minute expiry to `VerificationToken`.
-- Send via Resend, URL: `${NEXTAUTH_URL}/verify-email/${token}`.
-- `/verify-email/[token]`: validate token, check expiry, set `user.emailVerified = new Date()`, delete token.
+- Send via Resend, URL: `${NEXTAUTH_URL}/auth/verify-email/${token}`.
+- `/auth/verify-email/[token]`: validate token, check expiry, set `user.emailVerified = new Date()`, delete token.
 - On expired/missing token: clear error + "Resend verification" CTA.
 - Update middleware/session callback: **only verified users access `/dashboard`**.
 
 ### Phase 4 — Forgot Password
-- `/forgot-password` page → POST endpoint.
+- `/auth/forgot-password` page → POST endpoint.
 - Generate reset token, save with **1-hour expiry** to `PasswordResetToken`.
 - Send reset email via Resend.
-- `/reset-password/[token]`: validate token + expiry → accept new password → `bcrypt.hash` → save → **delete token** → redirect to `/login`.
+- `/auth/reset-password/[token]`: validate token + expiry → accept new password → `bcrypt.hash` → save → **delete token** → redirect to `/auth/login`.
 - **Critical:** if the email is not found, **still return success**. Never confirm or deny existence of an account.
 
 ### Phase 5 — Rate Limiting & Hardening

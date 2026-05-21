@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     if (user) {
       const { token } = await issueResetToken(user.email);
-      const resetUrl = `${env.NEXTAUTH_URL}/reset-password/${token}`;
+      const resetUrl = `${env.NEXTAUTH_URL}/auth/reset-password/${token}`;
       try {
         await sendResetEmail({ to: user.email, name: user.name, resetUrl });
       } catch {

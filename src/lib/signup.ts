@@ -54,7 +54,7 @@ export async function createAccount(input: SignupInput): Promise<CreateAccountRe
   let emailSent = true;
   try {
     const { token } = await issueVerificationToken(user.email);
-    const verifyUrl = `${env.NEXTAUTH_URL}/verify-email/${token}`;
+    const verifyUrl = `${env.NEXTAUTH_URL}/auth/verify-email/${token}`;
     await sendVerificationEmail({
       to: user.email,
       name: user.name,

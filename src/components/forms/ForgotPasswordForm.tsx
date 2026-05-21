@@ -41,7 +41,7 @@ export function ForgotPasswordForm() {
           If an account exists for that email, we&apos;ve sent a reset link. Check your inbox.
         </p>
         <div className="mt-lg text-body-sm text-body">
-          <Link href="/login" className="underline">
+          <Link href="/auth/login" className="underline">
             Back to sign in
           </Link>
         </div>
@@ -81,7 +81,7 @@ export function ForgotPasswordForm() {
         {isSubmitting ? "Sending…" : "Send reset link"}
       </Button>
       <div className="mt-md text-body-sm text-body">
-        <Link href="/login" className="underline">
+        <Link href="/auth/login" className="underline">
           Back to sign in
         </Link>
       </div>

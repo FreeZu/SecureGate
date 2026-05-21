@@ -35,13 +35,13 @@ export async function middleware(req: NextRequest) {
     });
 
     if (!token) {
-      const url = new URL("/login", req.url);
+      const url = new URL("/auth/login", req.url);
       url.searchParams.set("callbackUrl", req.url);
       return NextResponse.redirect(url);
     }
 
     if (!token.emailVerified) {
-      return NextResponse.redirect(new URL("/verify-email-required", req.url));
+      return NextResponse.redirect(new URL("/auth/verify-email-required", req.url));
     }
   }
 
