@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AuthCard } from "@/components/AuthCard";
 
-// Reads the token from the URL segment and POSTs it to /api/verify-email
-// so the token never ends up in server access logs / referrer headers
-// (per react-email-templates §8 and the api-route-scaffolder note about
-// flat token routes).
+// Posts the URL token to /api/verify-email so the token never lives in
+// server access logs / referrer headers.
 
 type Status = "verifying" | "success" | "error";
 
@@ -21,12 +20,10 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
       body: JSON.stringify({ token: params.token }),
     })
       .then((r) => {
-        if (cancelled) return;
-        setStatus(r.ok ? "success" : "error");
+        if (!cancelled) setStatus(r.ok ? "success" : "error");
       })
       .catch(() => {
-        if (cancelled) return;
-        setStatus("error");
+        if (!cancelled) setStatus("error");
       });
     return () => {
       cancelled = true;
@@ -34,10 +31,7 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
   }, [params.token]);
 
   return (
-    <div
-      className="w-full rounded-lg p-xxl"
-      style={{ border: "1px solid var(--color-hairline)" }}
-    >
+    <AuthCard>
       {status === "verifying" && (
         <>
           <h1 className="text-heading-lg font-display font-semibold text-ink">
@@ -48,12 +42,8 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
       )}
       {status === "success" && (
         <>
-          <h1 className="text-heading-lg font-display font-semibold text-ink">
-            Email verified
-          </h1>
-          <p className="mt-lg text-body-md text-body">
-            You can now sign in to your account.
-          </p>
+          <h1 className="text-heading-lg font-display font-semibold text-ink">Email verified</h1>
+          <p className="mt-lg text-body-md text-body">You can now sign in to your account.</p>
           <Link
             href="/login"
             className="mt-xl inline-block text-button-md font-medium text-primary underline"
@@ -78,6 +68,6 @@ export default function VerifyEmailTokenPage({ params }: { params: { token: stri
           </Link>
         </>
       )}
-    </div>
+    </AuthCard>
   );
 }

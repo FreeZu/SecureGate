@@ -1,19 +1,22 @@
-// Phase 2 placeholder. The actual LoginForm (with the open-redirect guard,
-// the Suspense boundary, and the existence-safe error wording from
-// nextauth-integration §5) lands in Phase 6.
+import { Suspense } from "react";
+import { AuthCard } from "@/components/AuthCard";
+import { LoginForm } from "@/components/forms/LoginForm";
+
+// Suspense boundary required by useSearchParams inside LoginForm
+// (nextauth-integration §5 + Next.js 14 client-side-bailout warning).
 
 export default function LoginPage() {
   return (
-    <div className="w-full rounded-lg border-hairline border-solid border-hairline-strong p-xxl">
-      <h1 className="text-heading-lg font-display font-semibold text-ink">
-        Sign in to SecureGate
-      </h1>
+    <AuthCard>
+      <h1 className="text-heading-lg font-display font-semibold text-ink">Sign in to SecureGate</h1>
       <p className="mt-lg text-body-md text-body">
-        The login form lands in Phase 6 — UI polish. Until then the NextAuth
-        Credentials endpoint accepts POST requests directly at{" "}
-        <code className="text-code-sm">/api/auth/callback/credentials</code> with
-        an email/password body.
+        Welcome back. Enter your credentials to continue.
       </p>
-    </div>
+      <div className="mt-xl">
+        <Suspense fallback={<p className="text-body-sm text-body">Loading…</p>}>
+          <LoginForm />
+        </Suspense>
+      </div>
+    </AuthCard>
   );
 }

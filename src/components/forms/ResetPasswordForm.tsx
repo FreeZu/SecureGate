@@ -1,0 +1,112 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { TextInput } from "@/components/ui/TextInput";
+import { PasswordStrength } from "@/components/PasswordStrength";
+
+type Status = "idle" | "submitting" | "success" | "error" | "mismatch";
+
+interface ResetPasswordFormProps {
+  token: string;
+}
+
+export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password !== confirm) {
+      setStatus("mismatch");
+      return;
+    }
+    setStatus("submitting");
+
+    try {
+      const r = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
+      if (r.ok) {
+        setStatus("success");
+        setTimeout(() => router.push("/login"), 1200);
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  const isSubmitting = status === "submitting";
+  const isDone = status === "success";
+
+  if (isDone) {
+    return (
+      <p role="alert" aria-live="polite" className="text-body-md text-body">
+        Password updated. Redirecting to sign in…
+      </p>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-lg" noValidate>
+      <div>
+        <TextInput
+          id="reset-password"
+          label="New password"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="new-password"
+          required
+          disabled={isSubmitting}
+          minLength={8}
+          maxLength={72}
+          helper="At least 8 characters, with one letter and one number."
+        />
+        <PasswordStrength password={password} />
+      </div>
+      <TextInput
+        id="reset-password-confirm"
+        label="Confirm new password"
+        type="password"
+        value={confirm}
+        onChange={setConfirm}
+        autoComplete="new-password"
+        required
+        disabled={isSubmitting}
+        minLength={8}
+        maxLength={72}
+        error={status === "mismatch" ? "Passwords do not match." : undefined}
+      />
+      {status === "error" && (
+        <div role="alert" aria-live="polite">
+          <p className="text-body-sm" style={{ color: "var(--color-error)" }}>
+            We couldn&apos;t reset your password. The link may have expired, or the password
+            doesn&apos;t meet the requirements.
+          </p>
+          <p className="mt-md text-body-sm text-body">
+            <Link href="/forgot-password" className="underline">
+              Request a new reset link
+            </Link>
+          </p>
+        </div>
+      )}
+      <Button
+        type="submit"
+        isLoading={isSubmitting}
+        disabled={!password || !confirm}
+        className="self-start"
+      >
+        {isSubmitting ? "Updating…" : "Update password"}
+      </Button>
+    </form>
+  );
+}
