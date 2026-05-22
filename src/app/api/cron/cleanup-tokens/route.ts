@@ -9,7 +9,9 @@ import { ok, unauthorized, serverError } from "@/lib/api-responses";
 // leak the secret via response timing (prisma-auth-schema §6 smaller item).
 //
 // Deletes all expired verification + reset tokens in a single transaction.
-// Schedule (every 6 hours) lives in vercel.json.
+// Schedule (daily at 03:00 UTC) lives in vercel.json. Vercel's Hobby plan
+// caps cron at once per day; if you upgrade to Pro, tighten the cadence
+// (e.g., every 6 hours) for fresher cleanup.
 
 export async function GET(req: NextRequest) {
   const provided = req.headers.get("authorization");
