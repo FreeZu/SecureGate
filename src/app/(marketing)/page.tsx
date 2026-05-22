@@ -1,17 +1,27 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ShieldMark } from "@/components/icons/ShieldMark";
+import { TerminalCard } from "@/components/TerminalCard";
 
-// Marketing landing surface. Implements the in-scope subset of DESIGN.md:
-//   - Centered hero with shield mark, display-xl headline, and the
-//     signature code-snippet pill
-//   - One "Your data stays yours" security strip
-//   - Minimal footer
-// Out of current PRD scope (per DESIGN.md scope note): /pricing tiers,
-// FAQ wall, terminal mockup, "Auth done right" split. Add those only when
-// the PRD is explicitly extended.
+// Marketing landing surface, implementing the full home-page composition
+// from DESIGN.md:
+//   - Centered hero (shield, headline, code-snippet pill, CTAs)
+//   - "Auth done right" 2-column split (text + terminal mockup)
+//   - "Your data stays yours" security strip
+// The primary nav and footer come from (marketing)/layout.tsx.
 
 const HERO_SNIPPET = 'await signIn("credentials", { email, password })';
+
+const TERMINAL_CONTENT = `# Clone, configure, run
+$ git clone https://github.com/FreeZu/SecureGate.git
+$ cd SecureGate
+$ cp .env.example .env.local
+$ npm install
+$ npx prisma migrate dev
+$ npm run dev
+
+  Next.js 14.2 — Ready in 1.2s
+  Local: http://localhost:3000`;
 
 export default function HomePage() {
   return (
@@ -29,15 +39,13 @@ export default function HomePage() {
           rate-limited endpoints. The boring parts of authentication, built carefully.
         </p>
 
-        {/* Code-snippet pill — signature element from DESIGN.md */}
         <div className="mt-xxl inline-flex h-code-snippet items-center rounded-full bg-surface-soft px-xl">
           <code className="font-mono text-code-md text-ink">{HERO_SNIPPET}</code>
         </div>
 
-        {/* CTAs — one primary pill + one text link, per design-system §1.5 */}
         <div className="mt-xl flex flex-wrap items-center justify-center gap-md">
           <Link href="/auth/signup" className="inline-flex">
-            <Button>Create an account</Button>
+            <Button>Get started</Button>
           </Link>
           <Link
             href="/auth/login"
@@ -48,7 +56,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Security strip — the single "Your data stays yours" guarantee */}
+      {/* Auth done right — 2-column split per DESIGN.md Layout */}
+      <section className="mt-section grid gap-xxl md:grid-cols-2 md:items-center">
+        <div>
+          <h2 className="text-heading-lg font-display font-semibold text-ink">
+            Auth done right.
+          </h2>
+          <p className="mt-md text-body-md text-body">
+            Clone the repo, drop in your env vars, run one migration, and you have
+            a production-grade auth surface. Every primitive is wired the way
+            it should be the first time — not patched in after a security audit.
+          </p>
+          <p className="mt-md text-body-md text-body">
+            No social-login glue, no admin dashboards, no scope creep. Just the
+            auth flows that every app needs, built carefully enough to stop
+            being something you have to think about.
+          </p>
+        </div>
+        <TerminalCard>{TERMINAL_CONTENT}</TerminalCard>
+      </section>
+
+      {/* Your data stays yours — security strip */}
       <section
         className="mt-section rounded-lg p-xxl"
         style={{ border: "1px solid var(--color-hairline)" }}
@@ -65,20 +93,11 @@ export default function HomePage() {
               Passwords hashed with bcrypt at 12 rounds. Verification and reset tokens
               generated from 256 bits of cryptographic entropy and stored single-use.
               Sessions signed with HS256 JWTs in HttpOnly, Secure, SameSite=Lax cookies.
-              Sign-in and reset endpoints rate-limited at the edge. HSTS
-              preload-eligible.
+              Sign-in and reset endpoints rate-limited at the edge. HSTS preload-eligible.
             </p>
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer
-        className="mt-section pt-xl text-center text-caption-sm text-body"
-        style={{ borderTop: "1px solid var(--color-hairline)" }}
-      >
-        &copy; 2026 SecureGate
-      </footer>
     </main>
   );
 }
