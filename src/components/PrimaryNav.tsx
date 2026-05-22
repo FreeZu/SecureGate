@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldMark } from "@/components/icons/ShieldMark";
+import { PadlockMark } from "@/components/icons/PadlockMark";
 import { Button } from "@/components/ui/Button";
 
 // Per DESIGN.md primary-nav: canvas bg, ink text, h-nav (56px), hairline
@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/Button";
 
 interface PrimaryNavProps {
   isAuthenticated: boolean;
+  hideAuthCtas?: boolean;
 }
 
 const GITHUB_URL = "https://github.com/FreeZu/SecureGate";
 
-export function PrimaryNav({ isAuthenticated }: PrimaryNavProps) {
+export function PrimaryNav({ isAuthenticated, hideAuthCtas = false }: PrimaryNavProps) {
   return (
     <header
       className="w-full bg-canvas"
@@ -21,30 +22,27 @@ export function PrimaryNav({ isAuthenticated }: PrimaryNavProps) {
     >
       <nav className="mx-auto flex h-nav max-w-content items-center justify-between px-xl">
         <Link href="/" className="flex items-center gap-sm text-ink">
-          <ShieldMark size={28} />
+          <PadlockMark size={28} />
           <span className="text-body-md font-display font-semibold">SecureGate</span>
         </Link>
 
-        <div className="flex items-center gap-lg text-body-sm font-medium text-ink">
-          <Link href="/pricing" className="hidden sm:inline">
-            Pricing
-          </Link>
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="hidden sm:inline">
+        <div className="flex items-center gap-12 text-body-sm font-medium text-ink">
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline"
+          >
             GitHub
           </a>
-          {isAuthenticated ? (
+          {hideAuthCtas ? null : isAuthenticated ? (
             <Link href="/dashboard" className="inline-flex">
               <Button>Dashboard</Button>
             </Link>
           ) : (
-            <>
-              <Link href="/auth/login" className="hidden sm:inline">
-                Sign in
-              </Link>
-              <Link href="/auth/signup" className="inline-flex">
-                <Button>Get started</Button>
-              </Link>
-            </>
+            <Link href="/auth/login" className="hidden sm:inline">
+              Sign in
+            </Link>
           )}
         </div>
       </nav>
