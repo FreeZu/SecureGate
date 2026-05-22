@@ -104,7 +104,7 @@ securegate/
 └── README.md
 ```
 
-> `DESIGN.md` is referenced by `design-system.md` as descriptive companion documentation but is not currently present in the repo. If added later, it belongs at the top level alongside `AGENTS.md`. Until it exists, `tokens/tokens.css` is the sole canonical design source.
+> `DESIGN.md` lives at the top level alongside `AGENTS.md`. It documents the design vocabulary descriptively — read it for intent and component composition. `tokens/tokens.css` remains the canonical source for the actual values; when DESIGN.md and tokens.css disagree, tokens.css wins.
 
 ---
 
