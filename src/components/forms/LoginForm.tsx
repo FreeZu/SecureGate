@@ -66,7 +66,17 @@ export function LoginForm() {
 
     if (!result?.ok) {
       setStatus("error");
-      setError("We could not sign you in. Please check your details and try again.");
+      // Middleware short-circuits with 429 when the per-IP signin rate
+      // limit is exceeded (security.md §3). The 429 fires regardless of
+      // whether the email exists, so this message leaks no information
+      // about account existence — it's about request rate, not credentials.
+      if (result?.status === 429) {
+        setError(
+          "Too many sign-in attempts. Please wait a few minutes before trying again.",
+        );
+      } else {
+        setError("We could not sign you in. Please check your details and try again.");
+      }
       return;
     }
 
