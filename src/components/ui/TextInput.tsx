@@ -81,8 +81,6 @@ export function TextInput({
           style={{
             border: `1px solid ${hasError ? "var(--color-error)" : "var(--color-hairline)"}`,
             fontSize: "var(--font-size-body-md)",
-            // Suppress Edge's native reveal — ours replaces it.
-            WebkitTextSecurity: undefined,
           }}
         />
         {isPassword && (
