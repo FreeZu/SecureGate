@@ -18,3 +18,10 @@ body {
   outline: var(--border-width-focus) solid var(--color-focus-ring);
   outline-offset: 2px;
 }
+
+/* Suppress Edge / IE native password reveal and clear buttons — TextInput
+   renders its own reveal toggle that also works on autofill. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

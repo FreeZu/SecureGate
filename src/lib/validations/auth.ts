@@ -6,7 +6,7 @@ import { z } from "zod";
 //   - .strict() on write schemas (blocks mass assignment per security.md §7)
 //
 // Password constraints per security.md §1:
-//   - signup: min 8, max 72, must include a letter AND a number
+//   - signup: min 8, max 72, must include lowercase, uppercase, number, symbol
 //   - login:  min 1, max 72 (the schema only confirms shape — bcrypt.compare
 //             does the real work; older passwords may predate the strength rule)
 // 72 is bcrypt's hard limit; longer strings are silently truncated, which
@@ -14,14 +14,16 @@ import { z } from "zod";
 
 export const signupSchema = z
   .object({
-    name: z.string().trim().min(1).max(100),
+    name: z.string().trim().min(2).max(100),
     email: z.string().trim().toLowerCase().email().max(254),
     password: z
       .string()
       .min(8)
       .max(72)
-      .regex(/[A-Za-z]/, "Password must include a letter")
-      .regex(/[0-9]/, "Password must include a number"),
+      .regex(/[a-z]/, "Password must include a lowercase letter")
+      .regex(/[A-Z]/, "Password must include an uppercase letter")
+      .regex(/[0-9]/, "Password must include a number")
+      .regex(/[^A-Za-z0-9]/, "Password must include a special character"),
   })
   .strict();
 

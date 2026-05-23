@@ -49,7 +49,7 @@ When uncertain about a security trade-off, **default to the more restrictive opt
 ### Validation (server-side, in Zod schema)
 - Minimum 8 characters.
 - Maximum 72 characters (bcrypt's hard limit — strings longer are silently truncated, which creates a vulnerability if not enforced).
-- At least one letter and one number is the minimum bar; the UI shows a 3-step strength indicator (weak/fair/strong) that nudges users toward stronger passwords but does not block "fair" submissions.
+- Must include at least one lowercase letter, one uppercase letter, one number, and one special character (any non-alphanumeric). The UI shows a 3-step strength indicator (weak/fair/strong) that nudges users toward stronger passwords but does not block "fair" submissions.
 
 ### Client-side
 - **Never log a password.** Not in `console.log`, not in error tracking.

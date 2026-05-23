@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AuthCard } from "@/components/AuthCard";
 
 // Posts the URL token to /api/verify-email so the token never lives in
 // server access logs / referrer headers.
+//
+// Single-fire guard: tokens are single-use, so we cannot let React Strict
+// Mode's dev double-invoke of useEffect (or any duplicate mount) fire two
+// requests — the first would succeed and the second would always see
+// "already consumed" and surface as an error. A module-level ref keyed by
+// the token ensures one fetch per token per browser tab lifetime.
 
 type Status = "verifying" | "success" | "error";
 
 export default function VerifyEmailTokenPage({ params }: { params: { token: string } }) {
   const [status, setStatus] = useState<Status>("verifying");
+  const firedRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (firedRef.current === params.token) return;
+    firedRef.current = params.token;
+
     let cancelled = false;
     fetch("/api/verify-email", {
       method: "POST",

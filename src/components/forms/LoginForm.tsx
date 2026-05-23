@@ -88,6 +88,7 @@ export function LoginForm() {
         required
         disabled={isSubmitting}
         maxLength={254}
+        autoFocus
       />
       <TextInput
         id="login-password"

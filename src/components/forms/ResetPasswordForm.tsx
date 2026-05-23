@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { TextInput } from "@/components/ui/TextInput";
 import { PasswordStrength } from "@/components/PasswordStrength";
 
-type Status = "idle" | "submitting" | "success" | "error" | "mismatch";
+type Status = "idle" | "submitting" | "success" | "error";
 
 interface ResetPasswordFormProps {
   token: string;
@@ -19,12 +19,14 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [confirm, setConfirm] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
+  // Live mismatch check. Hidden while the confirm field is empty so we do not
+  // flag a mismatch before the user has finished typing it.
+  const mismatchError =
+    confirm.length > 0 && password !== confirm ? "Passwords do not match." : null;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password !== confirm) {
-      setStatus("mismatch");
-      return;
-    }
+    if (mismatchError) return;
     setStatus("submitting");
 
     try {
@@ -69,7 +71,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           disabled={isSubmitting}
           minLength={8}
           maxLength={72}
-          helper="At least 8 characters, with one letter and one number."
+          helper="At least 8 characters, with uppercase, lowercase, a number, and a symbol."
         />
         <PasswordStrength password={password} />
       </div>
@@ -84,7 +86,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         disabled={isSubmitting}
         minLength={8}
         maxLength={72}
-        error={status === "mismatch" ? "Passwords do not match." : undefined}
+        error={mismatchError ?? undefined}
       />
       {status === "error" && (
         <div role="alert" aria-live="polite">
@@ -102,8 +104,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={!password || !confirm}
-        className="self-start"
+        disabled={!password || !confirm || !!mismatchError}
+        className="self-start mt-sm"
       >
         {isSubmitting ? "Updating…" : "Update password"}
       </Button>

@@ -13,6 +13,11 @@ import { PasswordStrength } from "@/components/PasswordStrength";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+// Mirror of server-side rule in src/lib/validations/auth.ts. Kept loose
+// on purpose — the server's Zod schema is the source of truth; this only
+// blocks obvious mistakes before a network round-trip.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 export function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,8 +25,21 @@ export function SignupForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
+  // Live, derived per render. The `length > 0` guard keeps us from yelling
+  // at the user the moment the page loads — an empty field is "not yet
+  // filled," not "wrong."
+  const nameError =
+    name.length > 0 && name.trim().length < 2
+      ? "Name must be at least 2 characters."
+      : null;
+  const emailError =
+    email.length > 0 && !EMAIL_RE.test(email.trim())
+      ? "Please enter a valid email address."
+      : null;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (nameError || emailError) return;
     setStatus("submitting");
     setError(null);
 
@@ -80,6 +98,8 @@ export function SignupForm() {
         required
         disabled={isSubmitting}
         maxLength={100}
+        autoFocus
+        error={nameError ?? undefined}
       />
       <TextInput
         id="signup-email"
@@ -91,6 +111,7 @@ export function SignupForm() {
         required
         disabled={isSubmitting}
         maxLength={254}
+        error={emailError ?? undefined}
       />
       <div>
         <TextInput
@@ -104,7 +125,7 @@ export function SignupForm() {
           disabled={isSubmitting}
           minLength={8}
           maxLength={72}
-          helper="At least 8 characters, with one letter and one number."
+          helper="At least 8 characters, with uppercase, lowercase, a number, and a symbol."
         />
         <PasswordStrength password={password} />
       </div>
@@ -121,7 +142,7 @@ export function SignupForm() {
       <Button
         type="submit"
         isLoading={isSubmitting}
-        disabled={!name || !email || !password}
+        disabled={!name || !email || !password || !!nameError || !!emailError}
         className="self-start"
       >
         {isSubmitting ? "Creating account…" : "Create account"}
