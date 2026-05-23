@@ -34,7 +34,7 @@ export default async function HomePage() {
         {/* Bottom close — single oversized black pill */}
         <section className="flex flex-col items-center px-xl pb-section text-center">
           <Link href="/auth/signup" className="inline-flex">
-            <Button className="h-20 px-16 text-xl">Get started</Button>
+            <Button className="!h-20 !px-16 !text-xl">Get started</Button>
           </Link>
         </section>
       </main>
