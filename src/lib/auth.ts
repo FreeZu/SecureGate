@@ -49,7 +49,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        // TEMP DIAGNOSTIC — remove after the prod-login issue is resolved.
+        // Logs structural facts only: no passwords, no emails, no hashes.
+        const passwordLen =
+          typeof credentials?.password === "string" ? credentials.password.length : -1;
+        if (!parsed.success) {
+          console.log("[auth.authorize] schema-parse-failed", {
+            passwordLen,
+            issues: parsed.error.issues.map((i) => ({ path: i.path, code: i.code })),
+          });
+          return null;
+        }
 
         const { email, password } = parsed.data;
         const user = await prisma.user.findUnique({ where: { email } });
@@ -59,6 +69,16 @@ export const authOptions: NextAuthOptions = {
         const isValid = user
           ? await bcrypt.compare(password, user.password)
           : await bcrypt.compare(password, DUMMY_HASH);
+
+        // TEMP DIAGNOSTIC.
+        console.log("[auth.authorize] result", {
+          userFound: !!user,
+          isValid,
+          emailVerified: user?.emailVerified ? true : false,
+          storedHashPrefix: user?.password.slice(0, 7),
+          storedHashLen: user?.password.length,
+          passwordLen: password.length,
+        });
 
         if (!user || !isValid) return null;
 
