@@ -33,8 +33,12 @@ export const loginSchema = z
   .object({
     email: z.string().trim().toLowerCase().email().max(254),
     password: z.string().min(1).max(72),
-  })
-  .strict();
+    // NOTE: .strip() (default) is intentional here. NextAuth's authorize()
+    // callback receives extra fields (csrfToken, callbackUrl, redirect, json)
+    // alongside the user-submitted credentials. .strict() would reject those
+    // as unrecognized keys before bcrypt runs, breaking every login attempt.
+    // We only extract email and password; the rest are safely discarded.
+  });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
